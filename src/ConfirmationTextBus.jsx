@@ -11,7 +11,10 @@ import {
   RadioGroup,
   FormControl,
   InputLabel,
+  Button,
 } from '@mui/material';
+import FileCopyOutlinedIcon from '@mui/icons-material/FileCopyOutlined';
+
 import moment from 'moment';
 
 const ConfirmationForm = () => {
@@ -41,19 +44,11 @@ const ConfirmationForm = () => {
     );
 
     let confirmationText;
-    let parts = formData.busTime.split(' ');
+    // let parts = formData.busTime.split(' ');
 
-    // Find and remove "PM" if it's present in the time
-    const timeIndex = parts.indexOf('PM');
-    if (timeIndex !== -1) {
-      parts.splice(timeIndex, 1);
-    }
+    // const time = `${parts[0]}`;
 
-    const time = parts.join(' '); // Reconstruct the time without "PM"
-
-    console.log('🚀 ~ generateConfirmationText ~ time:', time);
-    if (formData.busStation === 'QN') {
-      confirmationText = `❤️❤️ EPIC đặt xe chuyến ${formData.busTime}
+    confirmationText = `❤️❤️ EPIC đặt xe chuyến ${formData.busTime}
       + Tên khách: ${formData.name}
       + Số lượng vé: ${formData.pax}
       + SĐT liên lạc: ${formData.phoneNumber}
@@ -71,25 +66,6 @@ const ConfirmationForm = () => {
       }
       -----------------------------
       Thanh toán: CÔNG NỢ`;
-    } else if (formData.busStation === 'BP') {
-      confirmationText = `Xác nhận giúp em dịch vụ xe HÀ NỘI  - HÀ GIANG LIMOUSINE CHUYẾN 16:00 PM với thông tin như sau:
-      + Tên:  ${formData.name}
-      + Số lượng vé: ${formData.pax}
-      + SĐT liên lạc: ${formData.phoneNumber}
-      + Ngày đón:  ${busPickUpDateFormat}
-      + Điểm đón: ${
-        formData.selectedPickupLocation === 'other'
-          ? formData.customPickupLocation
-          : formData.selectedPickupLocation
-      } 
-      + Điểm trả: ${
-        formData.selectedDropoffLocation === 'None'
-          ? formData.customDropoffLocation
-          : formData.selectedDropoffLocation
-      }
-      _____________________________
-      Thanh toán: CÔNG NỢ`;
-    }
 
     return confirmationText;
   };
@@ -109,13 +85,27 @@ const ConfirmationForm = () => {
 
   const confirmationText = generateConfirmationText();
 
+  const [copied, setCopied] = useState(false); // To track if the text is copied
+
+  // ... (your existing functions)
+
+  const handleCopy = () => {
+    // Create a temporary text area to copy text to the clipboard
+    const textArea = document.createElement('textarea');
+    textArea.value = confirmationText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    setCopied(true); // Set copied to true
+  };
   return (
     <Container>
       <Typography variant="h5" align="center">
         Epic Tour Confirmation Form
       </Typography>
       <Grid container spacing={3}>
-        <Grid item xs={6}>
+        <Grid item xs={12} md={6}>
           <form>
             <Grid container spacing={3}>
               <Grid item xs={6}>
@@ -265,11 +255,34 @@ const ConfirmationForm = () => {
           </form>
         </Grid>
 
-        <Grid item xs={6}>
-          {confirmationText && (
+        <Grid item xs={12} md={6}>
+          {/* {confirmationText && (
             <div>
               <Typography variant="h6">Generated Confirmation Text:</Typography>
               <pre>{confirmationText}</pre>
+            </div>
+          )} */}
+          {copied ? (
+            <div>
+              <Typography variant="h6">Text Copied!</Typography>
+            </div>
+          ) : (
+            <div>
+              {confirmationText && (
+                <div>
+                  <Typography variant="h6">
+                    Generated Confirmation Text:
+                  </Typography>
+                  <pre>{confirmationText}</pre>
+                  <Button
+                    variant="outlined"
+                    startIcon={<FileCopyOutlinedIcon />}
+                    onClick={handleCopy}
+                  >
+                    Copy Text
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </Grid>
